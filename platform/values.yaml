@@ -1,0 +1,238 @@
+# =============================================================================
+# llm-platform — combined default values
+#
+# This file is the single source of truth when installing the umbrella chart.
+#
+# To install:
+#   helm dependency update ./platform
+#   helm upgrade --install llm-platform ./platform -f ./platform/values.yaml
+#
+# To override for a specific environment, add another -f flag:
+#   helm upgrade --install llm-platform ./platform \
+#     -f ./platform/values.yaml \
+#     -f ./platform/overrides/gpu-a100.yaml
+# =============================================================================
+
+# ─────────────────────────────────────────────────────────────────────────────
+# KServe — CRDs (no configurable values)
+# ─────────────────────────────────────────────────────────────────────────────
+kserve-crd: {}
+
+kserve-llmisvc-crd: {}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# KServe — controller + runtime configs
+# ─────────────────────────────────────────────────────────────────────────────
+kserve-resources:
+  kserve:
+    version: v0.19.0
+    createSharedResources: true
+    inferenceServiceConfig:
+      enabled: ""
+    certManager:
+      enabled: ""
+    storagecontainer:
+      enabled: ""
+    agent:
+      image: kserve/agent
+      tag: ""
+    router:
+      image: kserve/router
+      tag: ""
+      imagePullPolicy: IfNotPresent
+      imagePullSecrets: []
+    service:
+      serviceClusterIPNone: false
+    storage:
+      image: kserve/storage-initializer
+      tag: ""
+      resources:
+        requests:
+          memory: 100Mi
+          cpu: 100m
+        limits:
+          memory: 1Gi
+          cpu: "1"
+      containerSecurityContext:
+        allowPrivilegeEscalation: false
+        privileged: false
+        runAsNonRoot: true
+        capabilities:
+          drop:
+            - ALL
+      enableModelcar: true
+      uidModelcar: 1010
+      cpuModelcar: 10m
+      memoryModelcar: 15Mi
+      caBundleConfigMapName: ""
+      caBundleVolumeMountPath: /etc/ssl/custom-certs
+      storageSpecSecretName: storage-config
+      storageSecretNameAnnotation: serving.kserve.io/secretName
+      s3:
+        accessKeyIdName: AWS_ACCESS_KEY_ID
+        secretAccessKeyName: AWS_SECRET_ACCESS_KEY
+        endpoint: ""
+        useHttps: ""
+        region: ""
+        verifySSL: ""
+        useVirtualBucket: ""
+        useAnonymousCredential: ""
+        CABundleConfigMap: ""
+        CABundle: ""
+    metricsaggregator:
+      enableMetricAggregation: "true"
+      enablePrometheusScraping: "true"
+    servingruntime:
+      art:
+        image: kserve/art-explainer
+        defaultVersion: ""
+    localmodel:
+      enabled: false
+
+kserve-runtime-configs: {}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# KServe — LLMInferenceService controller (llm-d integration layer)
+# ─────────────────────────────────────────────────────────────────────────────
+kserve-llmisvc-resources:
+  kserve:
+    version: v0.19.0
+    createSharedResources: true
+    inferenceServiceConfig:
+      enabled: ""
+    certManager:
+      enabled: ""
+    storagecontainer:
+      enabled: ""
+    agent:
+      image: kserve/agent
+      tag: ""
+    router:
+      image: kserve/router
+      tag: ""
+      imagePullPolicy: IfNotPresent
+      imagePullSecrets: []
+    service:
+      serviceClusterIPNone: false
+    storage:
+      image: kserve/storage-initializer
+      tag: ""
+      resources:
+        requests:
+          memory: 100Mi
+          cpu: 100m
+        limits:
+          memory: 1Gi
+          cpu: "1"
+      containerSecurityContext:
+        allowPrivilegeEscalation: false
+        privileged: false
+        runAsNonRoot: true
+        capabilities:
+          drop:
+            - ALL
+      enableModelcar: true
+      uidModelcar: 1010
+      cpuModelcar: 10m
+      memoryModelcar: 15Mi
+      caBundleConfigMapName: ""
+      caBundleVolumeMountPath: /etc/ssl/custom-certs
+      storageSpecSecretName: storage-config
+      storageSecretNameAnnotation: serving.kserve.io/secretName
+      s3:
+        accessKeyIdName: AWS_ACCESS_KEY_ID
+        secretAccessKeyName: AWS_SECRET_ACCESS_KEY
+        endpoint: ""
+        useHttps: ""
+        region: ""
+        verifySSL: ""
+        useVirtualBucket: ""
+        useAnonymousCredential: ""
+        CABundleConfigMap: ""
+        CABundle: ""
+    metricsaggregator:
+      enableMetricAggregation: "true"
+      enablePrometheusScraping: "true"
+    servingruntime:
+      art:
+        image: kserve/art-explainer
+        defaultVersion: ""
+    localmodel:
+      enabled: false
+      controller:
+        image: kserve/kserve-localmodel-controller
+        tag: ""
+      jobNamespace: kserve-localmodel-jobs
+      jobTTLSecondsAfterFinished: 3600
+      defaultJobImage: kserve/storage-initializer
+      defaultJobTag: ""
+
+# ─────────────────────────────────────────────────────────────────────────────
+# llm-d model-service
+# ─────────────────────────────────────────────────────────────────────────────
+llmd:
+  sampleApplication:
+    model:
+      modelArtifactURI: "hf://ibm-granite/granite-3.3-8b-instruct"
+      auth:
+        hfToken:
+          name: "hf-token"
+          key: "HF_TOKEN"
+      resources:
+        requests:
+          cpu: "4"
+          memory: "16Gi"
+          nvidia.com/gpu: "1"
+        limits:
+          cpu: "8"
+          memory: "32Gi"
+          nvidia.com/gpu: "1"
+    vllm:
+      enabled: true
+      extraArgs:
+        - "--enable-prefix-caching"
+        - "--disable-log-requests"
+    parallelism:
+      tensor: 1
+      pipeline: 1
+    replicas:
+      decode: 1
+      prefill: 0
+    labels:
+      llm-d.ai/inferenceServing: "true"
+
+  gateway:
+    provider: kgateway
+
+  inferencePool:
+    selector:
+      llm-d.ai/inferenceServing: "true"
+
+  endpointPicker:
+    enabled: true
+    scheduler:
+      strategies:
+        - prefix-cache-aware
+        - load-aware
+
+  kvCacheTiering:
+    enabled: false
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 8
+    targetGpuUtilization: 80
+
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: false
+      labels: {}
+      interval: 15s
+
+  multinode:
+    enabled: false
+
+  dra:
+    enabled: false

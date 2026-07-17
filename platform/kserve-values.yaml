@@ -1,0 +1,181 @@
+# =============================================================================
+# KServe values for the llm-platform umbrella chart
+#
+# NOTE: kserve-crd and kserve-llmisvc-crd are NOT dependencies anymore.
+# Their CRD manifests live in platform/crds/ and are applied by Helm
+# automatically before any sub-chart templates.
+# =============================================================================
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# kserve-resources — KServe controller + admission webhooks + RBAC
+# ─────────────────────────────────────────────────────────────────────────────
+kserve-resources:
+  kserve:
+    # Version of the KServe controller to deploy (must match chart version)
+    version: v0.19.0
+
+    # Create shared ConfigMaps, ClusterRoles, and ClusterRoleBindings.
+    # Set false only when managing these externally.
+    createSharedResources: true
+
+    # Pass "" to let KServe auto-detect; set "true"/"false" to force.
+    inferenceServiceConfig:
+      enabled: ""
+    certManager:
+      enabled: ""
+    storagecontainer:
+      enabled: ""
+
+    agent:
+      image: kserve/agent
+      tag: ""          # defaults to chart appVersion (v0.19.0)
+
+    # InferenceGraph header-based routing sidecar
+    router:
+      image: kserve/router
+      tag: ""
+      imagePullPolicy: IfNotPresent
+      imagePullSecrets: []
+
+    service:
+      # Headless service — set true to let llm-d EPP reach individual pod IPs
+      serviceClusterIPNone: false
+
+    # Storage initializer — downloads model artifacts into the serving pod
+    storage:
+      image: kserve/storage-initializer
+      tag: ""
+      resources:
+        requests:
+          memory: 100Mi
+          cpu: 100m
+        limits:
+          memory: 1Gi
+          cpu: "1"
+      containerSecurityContext:
+        allowPrivilegeEscalation: false
+        privileged: false
+        runAsNonRoot: true
+        capabilities:
+          drop:
+            - ALL
+      # Modelcar: pull model directly into pod's shared filesystem.
+      # Required for LLMInferenceService pod-init.
+      enableModelcar: true
+      uidModelcar: 1010
+      cpuModelcar: 10m
+      memoryModelcar: 15Mi
+      caBundleConfigMapName: ""
+      caBundleVolumeMountPath: /etc/ssl/custom-certs
+      storageSpecSecretName: storage-config
+      storageSecretNameAnnotation: serving.kserve.io/secretName
+      s3:
+        accessKeyIdName: AWS_ACCESS_KEY_ID
+        secretAccessKeyName: AWS_SECRET_ACCESS_KEY
+        endpoint: ""
+        useHttps: ""
+        region: ""
+        verifySSL: ""
+        useVirtualBucket: ""
+        useAnonymousCredential: ""
+        CABundleConfigMap: ""
+        CABundle: ""
+
+    # Enable Prometheus metrics aggregation — required for llm-d autoscaler
+    metricsaggregator:
+      enableMetricAggregation: "true"
+      enablePrometheusScraping: "true"
+
+    servingruntime:
+      art:
+        image: kserve/art-explainer
+        defaultVersion: ""
+
+    # Local model caching — disable unless using LocalModelNode CRDs
+    localmodel:
+      enabled: false
+
+# ─────────────────────────────────────────────────────────────────────────────
+# kserve-runtime-configs — pre-built ClusterServingRuntimes
+# MANDATORY since KServe v0.18; omitting this causes "no runtime found" errors.
+# No end-user configurable values — all runtimes live in chart templates.
+# ─────────────────────────────────────────────────────────────────────────────
+kserve-runtime-configs: {}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# kserve-llmisvc-resources — LLMInferenceService controller
+# Reconciles LLMInferenceService CRs and wires the llm-d scheduler/router.
+# ─────────────────────────────────────────────────────────────────────────────
+kserve-llmisvc-resources:
+  kserve:
+    version: v0.19.0
+    createSharedResources: true
+    inferenceServiceConfig:
+      enabled: ""
+    certManager:
+      enabled: ""
+    storagecontainer:
+      enabled: ""
+    agent:
+      image: kserve/agent
+      tag: ""
+    router:
+      image: kserve/router
+      tag: ""
+      imagePullPolicy: IfNotPresent
+      imagePullSecrets: []
+    service:
+      serviceClusterIPNone: false
+    storage:
+      image: kserve/storage-initializer
+      tag: ""
+      resources:
+        requests:
+          memory: 100Mi
+          cpu: 100m
+        limits:
+          memory: 1Gi
+          cpu: "1"
+      containerSecurityContext:
+        allowPrivilegeEscalation: false
+        privileged: false
+        runAsNonRoot: true
+        capabilities:
+          drop:
+            - ALL
+      enableModelcar: true
+      uidModelcar: 1010
+      cpuModelcar: 10m
+      memoryModelcar: 15Mi
+      caBundleConfigMapName: ""
+      caBundleVolumeMountPath: /etc/ssl/custom-certs
+      storageSpecSecretName: storage-config
+      storageSecretNameAnnotation: serving.kserve.io/secretName
+      s3:
+        accessKeyIdName: AWS_ACCESS_KEY_ID
+        secretAccessKeyName: AWS_SECRET_ACCESS_KEY
+        endpoint: ""
+        useHttps: ""
+        region: ""
+        verifySSL: ""
+        useVirtualBucket: ""
+        useAnonymousCredential: ""
+        CABundleConfigMap: ""
+        CABundle: ""
+    metricsaggregator:
+      enableMetricAggregation: "true"
+      enablePrometheusScraping: "true"
+    servingruntime:
+      art:
+        image: kserve/art-explainer
+        defaultVersion: ""
+    localmodel:
+      enabled: false
+      controller:
+        image: kserve/kserve-localmodel-controller
+        tag: ""
+      jobNamespace: kserve-localmodel-jobs
+      jobTTLSecondsAfterFinished: 3600
+      defaultJobImage: kserve/storage-initializer
+      defaultJobTag: ""

@@ -1,0 +1,15 @@
+dependencies:
+- name: kserve-resources
+  repository: oci://ghcr.io/kserve/charts
+  version: v0.19.0
+- name: kserve-runtime-configs
+  repository: oci://ghcr.io/kserve/charts
+  version: v0.19.0
+- name: kserve-llmisvc-resources
+  repository: oci://ghcr.io/kserve/charts
+  version: v0.19.0
+- name: llm-d-modelservice
+  repository: https://llm-d-incubation.github.io/llm-d-modelservice/
+  version: v0.4.15
+digest: sha256:e5b59fe09af0e554db3a1e7bea791d05241273f36b2c18ff6e885808d67fe6da
+generated: "2026-07-17T22:28:33.59153365+05:30"
