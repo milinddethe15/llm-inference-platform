@@ -1,0 +1,14 @@
+apiVersion: v2
+name: kserve-base
+version: 0.1.0
+
+dependencies:
+  # Core KServe CRDs: InferenceService, ServingRuntime, ClusterServingRuntime, etc.
+  - name: kserve-crd
+    version: v0.19.0
+    repository: "oci://ghcr.io/kserve/charts"
+
+  # LLMInferenceService CRD — the KServe-native resource for generative AI / llm-d.
+  - name: kserve-llmisvc-crd
+    version: v0.19.0
+    repository: "oci://ghcr.io/kserve/charts"

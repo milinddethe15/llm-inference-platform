@@ -1,0 +1,43 @@
+# -----------------------------------------------------------------------------
+# kserve-resources
+# -----------------------------------------------------------------------------
+kserve-resources:
+  kserve:
+    controller:
+      deploymentMode: Standard
+
+      resources:
+        requests:
+          cpu: 50m
+          memory: 256Mi
+        limits:
+          cpu: 250m
+          memory: 512Mi
+
+      gateway:
+        ingressGateway:
+          enableGatewayApi: true
+          kserveGateway: kserve/kserve-ingress-gateway
+
+# -----------------------------------------------------------------------------
+# kserve-runtime-configs
+# -----------------------------------------------------------------------------
+kserve-runtime-configs:
+  kserve:
+    servingruntime:
+      enabled: false
+
+# -----------------------------------------------------------------------------
+# kserve-llmisvc-resources
+# -----------------------------------------------------------------------------
+kserve-llmisvc-resources:
+  kserve:
+    llmisvc:
+      controller:
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 512Mi
