@@ -11,6 +11,8 @@ spec:
     repoURL: 'https://github.com/milinddethe15/llm-inference-platform.git'
     path: platform/argo-cd
     targetRevision: main
+    helm:
+      releaseName: argocd
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: argocd
