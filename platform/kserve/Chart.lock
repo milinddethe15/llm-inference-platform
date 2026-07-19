@@ -1,0 +1,12 @@
+dependencies:
+- name: kserve-resources
+  repository: oci://ghcr.io/kserve/charts
+  version: v0.19.0
+- name: kserve-runtime-configs
+  repository: oci://ghcr.io/kserve/charts
+  version: v0.19.0
+- name: kserve-llmisvc-resources
+  repository: oci://ghcr.io/kserve/charts
+  version: v0.19.0
+digest: sha256:e35f44d9a0d2dca98b81c49a475427c7e352d250e1cda5f09c67df465918bd49
+generated: "2026-07-19T00:07:01.006331218+05:30"
