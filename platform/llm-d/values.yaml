@@ -1,0 +1,2 @@
+llm-d-modelservice:
+  enabled: true

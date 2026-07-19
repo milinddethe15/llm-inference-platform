@@ -1,0 +1,6 @@
+dependencies:
+- name: llm-d-modelservice
+  repository: https://llm-d-incubation.github.io/llm-d-modelservice/
+  version: v0.4.15
+digest: sha256:80cef1d863d548688c0de4f5cc7f13a8431957d8ffa87d5ac00b6fd4a0bd3fe3
+generated: "2026-07-20T00:10:11.521431361+05:30"
