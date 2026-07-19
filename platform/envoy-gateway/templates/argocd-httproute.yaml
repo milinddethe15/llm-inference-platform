@@ -10,17 +10,13 @@ spec:
       name: eg
       # Must match the namespace where the Gateway is deployed
       namespace: envoy-gateway-system
+  hostnames:
+    - "argocd.llm.platform"
   rules:
     - matches:
         - path:
             type: PathPrefix
-            value: /argocd
-      filters:
-        - type: URLRewrite
-          urlRewrite:
-            path:
-              type: ReplacePrefixMatch
-              replacePrefixMatch: /
+            value: /
       backendRefs:
         - group: ''
           kind: Service
