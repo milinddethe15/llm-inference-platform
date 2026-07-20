@@ -15,11 +15,14 @@ kserve-resources:
           memory: 512Mi
 
       gateway:
-        domain: llm.platform
+        domain: inference.llm.platform
+        domainTemplate: "{{ .Name }}.{{ .IngressDomain }}"
+        urlScheme: http
         ingressGateway:
           enableGatewayApi: true
           gateway: envoy-gateway-system/eg
           className: eg
+          kserveGateway: envoy-gateway-system/eg
 
 # -----------------------------------------------------------------------------
 # kserve-llmisvc-resources
