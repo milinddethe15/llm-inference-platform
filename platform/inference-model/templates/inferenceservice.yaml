@@ -1,0 +1,18 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: {{ .Values.model.name }}
+spec:
+  predictor:
+    {{- if .Values.model.runtime }}
+    runtime: {{ .Values.model.runtime }}
+    {{- end }}
+
+    model:
+      modelFormat:
+        name: {{ .Values.model.modelFormat.name }}
+        version: "{{ .Values.model.modelFormat.version }}"
+      storageUri: {{ .Values.model.storageUri }}
+
+      resources:
+{{ toYaml .Values.resources | indent 8 }}

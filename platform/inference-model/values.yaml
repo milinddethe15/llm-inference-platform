@@ -1,0 +1,15 @@
+model:
+  name: sklearn-iris
+  runtime: ""
+  storageUri: gs://kfserving-examples/models/sklearn/1.0/model
+  modelFormat:
+    name: sklearn
+    version: "1"
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
