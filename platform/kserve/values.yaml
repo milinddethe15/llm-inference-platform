@@ -20,14 +20,6 @@ kserve-resources:
           kserveGateway: kserve/kserve-ingress-gateway
 
 # -----------------------------------------------------------------------------
-# kserve-runtime-configs
-# -----------------------------------------------------------------------------
-kserve-runtime-configs:
-  kserve:
-    servingruntime:
-      enabled: false
-
-# -----------------------------------------------------------------------------
 # kserve-llmisvc-resources
 # -----------------------------------------------------------------------------
 kserve-llmisvc-resources:

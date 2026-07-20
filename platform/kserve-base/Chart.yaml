@@ -12,3 +12,8 @@ dependencies:
   - name: kserve-llmisvc-crd
     version: v0.19.0
     repository: "oci://ghcr.io/kserve/charts"
+
+  # Pre-built ClusterServingRuntimes (vLLM, HuggingFace TGI, Triton, MLServer …).
+  - name: kserve-runtime-configs
+    version: v0.19.0
+    repository: "oci://ghcr.io/kserve/charts"

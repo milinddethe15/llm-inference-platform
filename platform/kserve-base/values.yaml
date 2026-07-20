@@ -1,3 +1,8 @@
 kserve-crd: {}
 
 kserve-llmisvc-crd: {}
+
+kserve-runtime-configs:
+  kserve:
+    servingruntime:
+      enabled: true

@@ -8,12 +8,6 @@ dependencies:
     version: v0.19.0
     repository: "oci://ghcr.io/kserve/charts"
 
-  # Pre-built ClusterServingRuntimes (vLLM, HuggingFace TGI, Triton, MLServer …).
-  # MANDATORY since KServe v0.18 — omitting this causes "no runtime found" errors.
-  - name: kserve-runtime-configs
-    version: v0.19.0
-    repository: "oci://ghcr.io/kserve/charts"
-
   # LLMInferenceService controller — reconciles LLMInferenceService objects,
   # wires the llm-d scheduler/router, and manages KV-cache aware routing.
   - name: kserve-llmisvc-resources
